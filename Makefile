@@ -22,7 +22,7 @@ GITHUB_DATABASE_MAX_IDLE_CONNS ?= 1
 GITHUB_WEBHOOK_TOPIC ?= "github-hook-owl"
 GITHUB_WEBHOOK_SECRET_KEY ?= "secret-token"
 
-GITHUB_WEBHOOK_NAME = "github_webhook"
+GITHUB_WEBHOOK_NAME = "github-hook-owl"
 GITHUB_WEBHOOK_ENTRY_POINT = "GithubWebhook"
 
 GITHUB_DATABASE_UPSERT_NAME = "github_db_upsert"
@@ -56,14 +56,14 @@ deploy-github-db-upsert:
 	--runtime $(RUNTIME) \
 	--region $(REGION) \
 	--set-env-vars GITHUB_DATABASE_URI=$(GITHUB_DATABASE_URI) \
-	--ignore-file "${GITHUB_DATABASE_UPSERT_NAME}.gcloudignore"
+	--ignore-file "github_db_upsert.gcloudignore"
 
 deploy-github-webhook:
 	gcloud functions deploy $(GITHUB_WEBHOOK_NAME) --entry-point $(GITHUB_WEBHOOK_ENTRY_POINT) \
 	--trigger-http \
 	--runtime $(RUNTIME) \
 	--region $(REGION) \
-	--set-env-vars GITHUB_WEBHOOK_TOPIC=$(GITHUB_WEBHOOK_TOPIC) GITHUB_WEBHOOK_SECRET_KEY=$(GITHUB_WEBHOOK_SECRET_KEY) \
-	--ignore-file "${GITHUB_WEBHOOK_NAME}.gcloudignore"
+	--set-env-vars GITHUB_WEBHOOK_TOPIC=$(GITHUB_WEBHOOK_TOPIC) --set-env-vars GITHUB_WEBHOOK_SECRET_KEY=$(GITHUB_WEBHOOK_SECRET_KEY) \
+	--ignore-file "github_webhook.gcloudignore"
 
 deploy-all:	create-github-webhook-topic	deploy-github-db-upsert	deploy-github-webhook

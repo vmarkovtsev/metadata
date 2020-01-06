@@ -1,0 +1,73 @@
+{
+    "action": "deleted",
+    "installation": {
+        "id": 6078756,
+        "account": {
+            "login": "kuba--",
+            "id": 4056521,
+            "node_id": "MDQ6VXNlcjQwNTY1MjE=",
+            "avatar_url": "https://avatars1.githubusercontent.com/u/4056521?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/kuba--",
+            "html_url": "https://github.com/kuba--",
+            "followers_url": "https://api.github.com/users/kuba--/followers",
+            "following_url": "https://api.github.com/users/kuba--/following{/other_user}",
+            "gists_url": "https://api.github.com/users/kuba--/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/kuba--/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/kuba--/subscriptions",
+            "organizations_url": "https://api.github.com/users/kuba--/orgs",
+            "repos_url": "https://api.github.com/users/kuba--/repos",
+            "events_url": "https://api.github.com/users/kuba--/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/kuba--/received_events",
+            "type": "User",
+            "site_admin": false
+        },
+        "repository_selection": "selected",
+        "access_tokens_url": "https://api.github.com/app/installations/6078756/access_tokens",
+        "repositories_url": "https://api.github.com/installation/repositories",
+        "html_url": "https://github.com/settings/installations/6078756",
+        "app_id": 49039,
+        "target_id": 4056521,
+        "target_type": "User",
+        "permissions": {
+            "administration": "read",
+            "contents": "read",
+            "metadata": "read",
+            "pull_requests": "read"
+        },
+        "events": [
+            "create",
+            "delete",
+            "member",
+            "public",
+            "pull_request",
+            "pull_request_review",
+            "pull_request_review_comment",
+            "push",
+            "repository"
+        ],
+        "created_at": "2020-01-06T14:33:15.000Z",
+        "updated_at": "2020-01-06T14:33:15.000Z",
+        "single_file_name": null
+    },
+    "sender": {
+        "login": "kuba--",
+        "id": 4056521,
+        "node_id": "MDQ6VXNlcjQwNTY1MjE=",
+        "avatar_url": "https://avatars1.githubusercontent.com/u/4056521?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/kuba--",
+        "html_url": "https://github.com/kuba--",
+        "followers_url": "https://api.github.com/users/kuba--/followers",
+        "following_url": "https://api.github.com/users/kuba--/following{/other_user}",
+        "gists_url": "https://api.github.com/users/kuba--/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/kuba--/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/kuba--/subscriptions",
+        "organizations_url": "https://api.github.com/users/kuba--/orgs",
+        "repos_url": "https://api.github.com/users/kuba--/repos",
+        "events_url": "https://api.github.com/users/kuba--/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/kuba--/received_events",
+        "type": "User",
+        "site_admin": false
+    }
+}
