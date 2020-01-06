@@ -5,23 +5,21 @@ import (
 	"testing"
 
 	fuzz "github.com/google/gofuzz"
+	"github.com/stretchr/testify/require"
 )
 
 func TestEvent(t *testing.T) {
+	require := require.New(t)
+
 	var src Event
 	fuzz.New().Fuzz(&src)
 
 	data, err := MarshalEvent(&src)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(err)
 
 	dst, err := UnmarshalEvent(data)
-	if err != nil {
-		t.Errorf("event: %v,  error: %s", src, err)
-	}
+	require.NoErrorf(err, "event: %v", src)
 
-	if src.Type != (*dst).Type || !bytes.Equal(src.Payload, (*dst).Payload) {
-		t.Errorf("event: %v, expected: %v", *dst, src)
-	}
+	require.Equal(src.Type, (*dst).Type)
+	require.Truef(bytes.Equal(src.Payload, (*dst).Payload), "event: %v, expected: %v", *dst, src)
 }

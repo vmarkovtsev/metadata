@@ -1,13 +1,13 @@
 # Incremental Metadata Updates
 
-Metadata is a service which updates our metadata storage. It relies on couple _hosted services_, but each of the following components should be scalable, fault tollerant and locally testable. 
+Metadata is a service which updates our metadata storage. It relies on couple _hosted services_, but each of the following components should be scalable, fault tollerant and locally testable.
 
  <img src="architecture.png" name="architecture" width="640"/>
 
-##### Git Version Control Service 
+##### Git Version Control Service
 Any git hosting service (like github, bitbucket, gitlab, ...) which exposes webhooks API (so far we only support github webhooks).
 
-##### Webhook 
+##### Webhook
 Can be a _Cloud Function_ or generally _HTTP Service_ which can handle _Metadata Events_. The main responsibility of _Webhook_ is to receive and publish the event to _PubSub Service_
 
 ##### PubSub Service
@@ -22,3 +22,13 @@ Schema based database where all repositories' metadata are stored. It's the main
 
 ##### Raw Events Storage
 Can be _Distributted File System_ or any _Storage Service_ where we can backup raw events (just in case, if we want to re-publish them).
+
+### Local testing
+Current implementation requires running PostgreSQL database (see docker-compose.yml file) with pre-created schema (see schema.sql file):
+
+```bash
+$ POSTGRES_DB=test POSTGRES_USER=user POSTGRES_PASSWORD=password  docker-compose up --no-deps postgres
+$ psql -h localhost -U user -W  -d test < schema.sql
+
+$ make test-all
+```

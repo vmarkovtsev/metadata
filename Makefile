@@ -1,24 +1,69 @@
 RUNTIME = go111
 REGION ?= "us-central1"
 
+# Note: By default,
+# Cloud Functions does not support connecting to the Cloud SQL instance using TCP.
+# Your code should not try to access the instance using an IP address (such as 127.0.0.1 or 172.17.0.1)
+# unless you have configured Serverless VPC Access.
+#
+# The PostgreSQL standard requires the Unix socket to have a .s.PGSQL.5432 suffix in the socket path.
+# Some libraries apply this suffix automatically,
+# but others require you to specify the socket path as follows:
+# postgres://<db_user>:<db_pass>@/<db_name>?host=/cloudsql/<cloud_sql_instance_name>/.s.PGSQL.5432
+GITHUB_DATABASE_URI ?= "postgres://user:password@127.0.0.1:5432/metadata"
+
+# When using a connection pool, it is important to set the maximum connections to 1.
+# This may seem counter-intuitive, however, Cloud Functions limits concurrent executions to 1 per instance.
+# This means you never have a situation where two requests are being processed by a single function instance at the same time.
+# This means in most situations only a single database connection is needed.
+GITHUB_DATABASE_MAX_OPEN_CONNS ?= 1
+GITHUB_DATABASE_MAX_IDLE_CONNS ?= 1
+
 GITHUB_WEBHOOK_TOPIC ?= "github-hook-owl"
+GITHUB_WEBHOOK_SECRET_KEY ?= "secret-token"
 
 GITHUB_WEBHOOK_NAME = "github_webhook"
 GITHUB_WEBHOOK_ENTRY_POINT = "GithubWebhook"
 
-GITHUB_UPDATE_NAME = "github_update"
-GITHUB_UPDATE_ENTRY_POINT = "GithubUpdate"
+GITHUB_DATABASE_UPSERT_NAME = "github_db_upsert"
+GITHUB_DATABASE_UPSERT_ENTRY_POINT = "GithubDbUpsert"
 
 echo-vars:
-	@echo "RUNTIME=${RUNTIME}\nREGION=${REGION}\nGITHUB_WEBHOOK_TOPIC=${GITHUB_WEBHOOK_TOPIC}\nGITHUB_WEBHOOK_NAME=${GITHUB_WEBHOOK_NAME}\nGITHUB_WEBHOOK_ENTRY_POINT=${GITHUB_WEBHOOK_ENTRY_POINT}\nGITHUB_UPDATE_NAME=${GITHUB_UPDATE_NAME}\nGITHUB_UPDATE_ENTRY_POINT=${GITHUB_UPDATE_ENTRY_POINT}\n"
+	@echo \
+	"RUNTIME=${RUNTIME}\n"\
+	"REGION=${REGION}\n"\
+	"GITHUB_DATABASE_URI=${GITHUB_DATABASE_URI}\n"\
+	"GITHUB_WEBHOOK_TOPIC=${GITHUB_WEBHOOK_TOPIC}\n"\
+	"GITHUB_WEBHOOK_NAME=${GITHUB_WEBHOOK_NAME}\n"\
+	"GITHUB_WEBHOOK_ENTRY_POINT=${GITHUB_WEBHOOK_ENTRY_POINT}\n"\
+	"GITHUB_WEBHOOK_SECRET_KEY=${GITHUB_WEBHOOK_SECRET_KEY}\n"\
+	"GITHUB_DATABASE_UPSERT_NAME=${GITHUB_DATABASE_UPSERT_NAME}\n"\
+	"GITHUB_DATABASE_MAX_OPEN_CONNS=${GITHUB_DATABASE_MAX_OPEN_CONNS}\n"\
+	"GITHUB_DATABASE_MAX_IDLE_CONNS=${GITHUB_DATABASE_MAX_IDLE_CONNS}\n"\
+	"GITHUB_DATABASE_UPSERT_ENTRY_POINT=${GITHUB_DATABASE_UPSERT_ENTRY_POINT}\n"
+
 
 test-all:
+	# cloud_sql_proxy -instances=<cloud_sql_instance_name>=tcp:5432
 	go test -v ./... --count 1
 
-deploy-github-update:
-	gcloud functions deploy $(GITHUB_UPDATE_NAME) --entry-point $(GITHUB_UPDATE_ENTRY_POINT) --trigger-topic $(GITHUB_WEBHOOK_TOPIC) --runtime $(RUNTIME) --region $(REGION) --ignore-file "${GITHUB_WEBHOOK_NAME}.gcloudignore"
+create-github-webhook-topic:
+	gcloud pubsub topics create $(GITHUB_WEBHOOK_TOPIC) --message-storage-policy-allowed-regions $(REGION)
+
+deploy-github-db-upsert:
+	gcloud functions deploy $(GITHUB_DATABASE_UPSERT_NAME) --entry-point $(GITHUB_DATABASE_UPSERT_ENTRY_POINT) \
+	--trigger-topic $(GITHUB_WEBHOOK_TOPIC) \
+	--runtime $(RUNTIME) \
+	--region $(REGION) \
+	--set-env-vars GITHUB_DATABASE_URI=$(GITHUB_DATABASE_URI) \
+	--ignore-file "${GITHUB_DATABASE_UPSERT_NAME}.gcloudignore"
 
 deploy-github-webhook:
-	gcloud functions deploy $(GITHUB_WEBHOOK_NAME) --entry-point $(GITHUB_WEBHOOK_ENTRY_POINT) --trigger-http --runtime $(RUNTIME) --region $(REGION) --set-env-vars GITHUB_WEBHOOK_TOPIC=$(GITHUB_WEBHOOK_TOPIC) --ignore-file "${GITHUB_WEBHOOK_NAME}.gcloudignore"
+	gcloud functions deploy $(GITHUB_WEBHOOK_NAME) --entry-point $(GITHUB_WEBHOOK_ENTRY_POINT) \
+	--trigger-http \
+	--runtime $(RUNTIME) \
+	--region $(REGION) \
+	--set-env-vars GITHUB_WEBHOOK_TOPIC=$(GITHUB_WEBHOOK_TOPIC) GITHUB_WEBHOOK_SECRET_KEY=$(GITHUB_WEBHOOK_SECRET_KEY) \
+	--ignore-file "${GITHUB_WEBHOOK_NAME}.gcloudignore"
 
-deploy-all: deploy-github-update	deploy-github-webhook
+deploy-all:	create-github-webhook-topic	deploy-github-db-upsert	deploy-github-webhook

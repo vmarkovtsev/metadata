@@ -21,6 +21,9 @@ node_modules
 *.png
 Makefile
 LICENSE
+*.sql
+docker-compose.yml
 
-github_update.go
+github/testdata/*
+github_db_upsert.go
 pubsub/subscribe.go

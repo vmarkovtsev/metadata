@@ -21,7 +21,11 @@ node_modules
 *.png
 Makefile
 LICENSE
+*.sql
+docker-compose.yml
 
 github_webhook.go
 github/webhook.go
+github/testdata/*
 pubsub/publish.go
+

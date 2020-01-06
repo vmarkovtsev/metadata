@@ -21,4 +21,6 @@ node_modules
 *.png
 Makefile
 LICENSE
-
+docker-compose.yml
+*.sql
+github/testdata/*
