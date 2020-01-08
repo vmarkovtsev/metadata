@@ -56,7 +56,7 @@ deploy-github-processor:
 	--runtime $(RUNTIME) \
 	--region $(REGION) \
 	--set-env-vars GITHUB_DATABASE_URI=$(GITHUB_DATABASE_URI) \
-	--ignore-file "github_processor.gcloudignore"
+	--ignore-file ".gcloudignore"
 
 deploy-github-webhook:
 	gcloud functions deploy $(GITHUB_WEBHOOK_NAME) --entry-point $(GITHUB_WEBHOOK_ENTRY_POINT) \
@@ -64,6 +64,6 @@ deploy-github-webhook:
 	--runtime $(RUNTIME) \
 	--region $(REGION) \
 	--set-env-vars GITHUB_WEBHOOK_TOPIC=$(GITHUB_WEBHOOK_TOPIC) --set-env-vars GITHUB_WEBHOOK_SECRET_KEY=$(GITHUB_WEBHOOK_SECRET_KEY) \
-	--ignore-file "github_webhook.gcloudignore"
+	--ignore-file ".gcloudignore"
 
 deploy-all:	create-github-webhook-topic	deploy-github-processor	deploy-github-webhook

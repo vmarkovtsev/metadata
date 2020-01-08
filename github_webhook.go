@@ -4,14 +4,18 @@ import (
 	"context"
 	"net/http"
 	"os"
+	"sync"
 
 	"github.com/athenianco/metadata/github"
 	"github.com/athenianco/metadata/pubsub"
 )
 
-var githubWebhook *github.Webhook
+var ghWebhook struct {
+	once sync.Once
+	*github.Webhook
+}
 
-func init() {
+func initGHWebhook() {
 	topicID := os.Getenv("GITHUB_WEBHOOK_TOPIC")
 	if topicID == "" {
 		panic("GITHUB_WEBHOOK_TOPIC is not set")
@@ -27,7 +31,7 @@ func init() {
 		panic(err)
 	}
 
-	githubWebhook = &github.Webhook{
+	ghWebhook.Webhook = &github.Webhook{
 		SecretKey: []byte(secretKey),
 		OnEvent: func(ctx context.Context, event *github.Event) error {
 			data, err := github.MarshalEvent(event)
@@ -41,5 +45,6 @@ func init() {
 
 // GithubWebhook is http.Handler triggered by github on metadata events.
 func GithubWebhook(w http.ResponseWriter, r *http.Request) {
-	githubWebhook.ServeHTTP(w, r)
+	ghWebhook.once.Do(initGHWebhook)
+	ghWebhook.ServeHTTP(w, r)
 }

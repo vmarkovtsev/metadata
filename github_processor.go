@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"strconv"
+	"sync"
 
 	"github.com/athenianco/metadata/github"
 	"github.com/athenianco/metadata/pubsub"
@@ -20,12 +21,13 @@ import (
  * but others require you to specify the socket path as follows:
  * /cloudsql/INSTANCE_CONNECTION_NAME/.s.PGSQL.5432.
  */
-var (
-	githubProcessor pubsub.Subscriber
-)
 
-func init() {
+var ghProcessor struct {
+	once sync.Once
+	fnc  pubsub.Subscriber
+}
 
+func initGHProcessor() {
 	dbURI := os.Getenv("GITHUB_DATABASE_URI")
 	if dbURI == "" {
 		panic("GITHUB_DATABASE_URI is not set")
@@ -50,7 +52,7 @@ func init() {
 		panic(err)
 	}
 
-	githubProcessor = func(ctx context.Context, msg pubsub.Message) error {
+	ghProcessor.fnc = func(ctx context.Context, msg pubsub.Message) error {
 		event, err := github.UnmarshalEvent(msg.Data)
 		if err != nil {
 			return err
@@ -61,5 +63,6 @@ func init() {
 
 // GithubProcess is triggered by Pub/Sub.
 func GithubProcess(ctx context.Context, msg pubsub.Message) error {
-	return githubProcessor(ctx, msg)
+	ghProcessor.once.Do(initGHProcessor)
+	return ghProcessor.fnc(ctx, msg)
 }
