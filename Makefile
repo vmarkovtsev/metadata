@@ -25,8 +25,8 @@ GITHUB_WEBHOOK_SECRET_KEY ?= "secret-token"
 GITHUB_WEBHOOK_NAME = "github-hook-owl"
 GITHUB_WEBHOOK_ENTRY_POINT = "GithubWebhook"
 
-GITHUB_DATABASE_UPSERT_NAME = "github_db_upsert"
-GITHUB_DATABASE_UPSERT_ENTRY_POINT = "GithubDbUpsert"
+GITHUB_PROCESSOR_NAME = "github_processor"
+GITHUB_PROCESSOR_ENTRY_POINT = "GithubProcess"
 
 echo-vars:
 	@echo \
@@ -37,10 +37,10 @@ echo-vars:
 	"GITHUB_WEBHOOK_NAME=${GITHUB_WEBHOOK_NAME}\n"\
 	"GITHUB_WEBHOOK_ENTRY_POINT=${GITHUB_WEBHOOK_ENTRY_POINT}\n"\
 	"GITHUB_WEBHOOK_SECRET_KEY=${GITHUB_WEBHOOK_SECRET_KEY}\n"\
-	"GITHUB_DATABASE_UPSERT_NAME=${GITHUB_DATABASE_UPSERT_NAME}\n"\
+	"GITHUB_PROCESSOR_NAME=${GITHUB_PROCESSOR_NAME}\n"\
+	"GITHUB_PROCESSOR_ENTRY_POINT=${GITHUB_PROCESSOR_ENTRY_POINT}\n"\
 	"GITHUB_DATABASE_MAX_OPEN_CONNS=${GITHUB_DATABASE_MAX_OPEN_CONNS}\n"\
-	"GITHUB_DATABASE_MAX_IDLE_CONNS=${GITHUB_DATABASE_MAX_IDLE_CONNS}\n"\
-	"GITHUB_DATABASE_UPSERT_ENTRY_POINT=${GITHUB_DATABASE_UPSERT_ENTRY_POINT}\n"
+	"GITHUB_DATABASE_MAX_IDLE_CONNS=${GITHUB_DATABASE_MAX_IDLE_CONNS}\n"
 
 
 test-all:
@@ -50,13 +50,13 @@ test-all:
 create-github-webhook-topic:
 	gcloud pubsub topics create $(GITHUB_WEBHOOK_TOPIC) --message-storage-policy-allowed-regions $(REGION)
 
-deploy-github-db-upsert:
-	gcloud functions deploy $(GITHUB_DATABASE_UPSERT_NAME) --entry-point $(GITHUB_DATABASE_UPSERT_ENTRY_POINT) \
+deploy-github-processor:
+	gcloud functions deploy $(GITHUB_PROCESSOR_NAME) --entry-point $(GITHUB_PROCESSOR_ENTRY_POINT) \
 	--trigger-topic $(GITHUB_WEBHOOK_TOPIC) \
 	--runtime $(RUNTIME) \
 	--region $(REGION) \
 	--set-env-vars GITHUB_DATABASE_URI=$(GITHUB_DATABASE_URI) \
-	--ignore-file "github_db_upsert.gcloudignore"
+	--ignore-file "github_processor.gcloudignore"
 
 deploy-github-webhook:
 	gcloud functions deploy $(GITHUB_WEBHOOK_NAME) --entry-point $(GITHUB_WEBHOOK_ENTRY_POINT) \
@@ -66,4 +66,4 @@ deploy-github-webhook:
 	--set-env-vars GITHUB_WEBHOOK_TOPIC=$(GITHUB_WEBHOOK_TOPIC) --set-env-vars GITHUB_WEBHOOK_SECRET_KEY=$(GITHUB_WEBHOOK_SECRET_KEY) \
 	--ignore-file "github_webhook.gcloudignore"
 
-deploy-all:	create-github-webhook-topic	deploy-github-db-upsert	deploy-github-webhook
+deploy-all:	create-github-webhook-topic	deploy-github-processor	deploy-github-webhook

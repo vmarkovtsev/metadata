@@ -1,7 +1,7 @@
 {
-    "action": "deleted",
+    "action": "created",
     "installation": {
-        "id": 6078756,
+        "id": 6094607,
         "account": {
             "login": "kuba--",
             "id": 4056521,
@@ -23,9 +23,9 @@
             "site_admin": false
         },
         "repository_selection": "selected",
-        "access_tokens_url": "https://api.github.com/app/installations/6078756/access_tokens",
+        "access_tokens_url": "https://api.github.com/app/installations/6094607/access_tokens",
         "repositories_url": "https://api.github.com/installation/repositories",
-        "html_url": "https://github.com/settings/installations/6078756",
+        "html_url": "https://github.com/settings/installations/6094607",
         "app_id": 49039,
         "target_id": 4056521,
         "target_type": "User",
@@ -46,10 +46,20 @@
             "push",
             "repository"
         ],
-        "created_at": "2020-01-06T14:33:15.000Z",
-        "updated_at": "2020-01-06T14:33:15.000Z",
+        "created_at": 1578399968,
+        "updated_at": 1578399968,
         "single_file_name": null
     },
+    "repositories": [
+        {
+            "id": 85718512,
+            "node_id": "MDEwOlJlcG9zaXRvcnk4NTcxODUxMg==",
+            "name": "cuckoo",
+            "full_name": "kuba--/cuckoo",
+            "private": false
+        }
+    ],
+    "requester": null,
     "sender": {
         "login": "kuba--",
         "id": 4056521,

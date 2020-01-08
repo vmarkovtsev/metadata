@@ -25,5 +25,5 @@ LICENSE
 docker-compose.yml
 
 github/testdata/*
-github_db_upsert.go
+github_processor.go
 pubsub/subscribe.go

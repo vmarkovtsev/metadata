@@ -21,7 +21,7 @@ import (
  * /cloudsql/INSTANCE_CONNECTION_NAME/.s.PGSQL.5432.
  */
 var (
-	githubDbUpserter pubsub.Subscriber
+	githubProcessor pubsub.Subscriber
 )
 
 func init() {
@@ -50,16 +50,16 @@ func init() {
 		panic(err)
 	}
 
-	githubDbUpserter = func(ctx context.Context, msg pubsub.Message) error {
+	githubProcessor = func(ctx context.Context, msg pubsub.Message) error {
 		event, err := github.UnmarshalEvent(msg.Data)
 		if err != nil {
 			return err
 		}
-		return event.UpsertPayload(ctx, db)
+		return event.Process(ctx, db)
 	}
 }
 
-// GithubDbUpsert is triggered by Pub/Sub.
-func GithubDbUpsert(ctx context.Context, msg pubsub.Message) error {
-	return githubDbUpserter(ctx, msg)
+// GithubProcess is triggered by Pub/Sub.
+func GithubProcess(ctx context.Context, msg pubsub.Message) error {
+	return githubProcessor(ctx, msg)
 }

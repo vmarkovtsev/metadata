@@ -11,7 +11,7 @@ import (
 
 const dbURI = "postgres://user:password@127.0.0.1:5432/test?sslmode=disable"
 
-func TestUpsert(t *testing.T) {
+func TestProcess(t *testing.T) {
 	require := require.New(t)
 
 	tests := []struct {
@@ -21,6 +21,15 @@ func TestUpsert(t *testing.T) {
 		expected interface{}
 		err      bool
 	}{
+		{
+			name:    "installation",
+			fixture: "testdata/installation_event.json",
+			query: `select id from github_repositories_versioned where (
+				name='cuckoo' and
+				fork=false
+			)`,
+			expected: []interface{}{int64(85718512)},
+		},
 		{
 			name:    "repository",
 			fixture: "testdata/repository_event.json",
@@ -124,7 +133,7 @@ func TestUpsert(t *testing.T) {
 				Payload: payload,
 			}
 
-			err = event.UpsertPayload(context.TODO(), db)
+			err = event.Process(context.TODO(), db)
 			if tc.err {
 				require.Error(err)
 			} else if tc.query != "" {
